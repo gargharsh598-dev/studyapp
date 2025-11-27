@@ -1,0 +1,149 @@
+.notes-upload-page {
+    min-height: 100vh;
+    padding: var(--spacing-2xl) 0;
+    background: var(--bg-primary);
+}
+
+.upload-header {
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+}
+
+.upload-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+.upload-header p {
+    color: var(--text-secondary);
+    font-size: 1.125rem;
+}
+
+.upload-card {
+    padding: var(--spacing-2xl);
+}
+
+.upload-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.textarea {
+    resize: vertical;
+    min-height: 100px;
+    font-family: var(--font-primary);
+}
+
+.file-upload-area {
+    position: relative;
+}
+
+.file-input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.file-upload-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-2xl);
+    background: var(--bg-secondary);
+    border: 2px dashed var(--border-color);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.file-upload-label:hover {
+    border-color: var(--primary-500);
+    background: var(--bg-tertiary);
+}
+
+.upload-icon {
+    font-size: 3rem;
+}
+
+.upload-text {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.upload-text strong {
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.upload-text span {
+    color: var(--text-tertiary);
+    font-size: 0.875rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: flex-end;
+    margin-top: var(--spacing-lg);
+}
+
+.upload-success {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xl);
+}
+
+.success-card {
+    text-align: center;
+    padding: var(--spacing-3xl) var(--spacing-2xl);
+    max-width: 500px;
+    animation: fadeIn var(--transition-slow);
+}
+
+.success-icon {
+    font-size: 5rem;
+    margin-bottom: var(--spacing-lg);
+    animation: pulse 1s ease-in-out;
+}
+
+.success-card h2 {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+}
+
+.success-card p {
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.redirect-text {
+    color: var(--primary-500);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+    .upload-header h1 {
+        font-size: 2rem;
+    }
+
+    .upload-card {
+        padding: var(--spacing-xl);
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-actions button {
+        width: 100%;
+    }
+}
