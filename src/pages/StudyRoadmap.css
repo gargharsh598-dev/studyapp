@@ -18,6 +18,17 @@
     background-clip: text;
 }
 
+.roadmap-container {
+    line-height: 1.6;
+    font-size: 18px;
+}
+
+.roadmap-container h1,
+.roadmap-container h2,
+.roadmap-container h3 {
+    margin-top: 20px;
+}
+
 .roadmap-header p {
     color: var(--text-secondary);
     font-size: 1.125rem;

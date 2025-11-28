@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { uploadNote } from '../services/firebaseService';
+import { uploadToCloudinary } from '../services/Cloudinary';
+// import { uploadNote } from '../services/firebaseService';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { db } from '../config/firebase.config';
+import { addDoc, collection } from 'firebase/firestore';
 import './NotesUpload.css';
 
 const NotesUpload = () => {
@@ -49,57 +53,46 @@ const NotesUpload = () => {
         }
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        console.log('Submit clicked');
-
-        if (!user) {
-            console.error('No user found');
-            setError('You must be logged in to upload notes.');
-            return;
-        }
-
+    const handleSubmit = async () => {
         if (!file) {
-            console.warn('No file selected');
-            setError('Please select a file to upload');
+            setError("Please upload a file");
             return;
         }
 
-        setUploading(true);
-        setError('');
-        console.log('Starting upload for:', file.name);
+        setError("");
 
-        try {
-            const noteData = {
-                ...formData,
-                uploadedBy: user.uid,
-                uploaderEmail: user.email
-            };
+        // 1️⃣ Upload file to Cloudinary
+        const result = await uploadToCloudinary(file);
 
-            console.log('Note data prepared:', noteData);
-            const result = await uploadNote(noteData, file);
-            console.log('Upload result:', result);
-
-            if (result.success) {
-                setSuccess(true);
-                setTimeout(() => {
-                    navigate('/teacher/dashboard');
-                }, 2000);
-            } else {
-                console.error('Upload failed:', result.error);
-                setError(result.error || 'Failed to upload note');
-                // Show alert for immediate visibility
-                alert(`Upload Failed: ${result.error || 'Unknown error'}`);
-            }
-        } catch (err) {
-            console.error('Unexpected error in handleSubmit:', err);
-            setError('An unexpected error occurred: ' + err.message);
-            alert('An unexpected error occurred: ' + err.message);
-        } finally {
-            setUploading(false);
+        if (!result.success) {
+            setError(result.error || "Failed to upload to Cloudinary");
+            setLoading(false);
+            return;
         }
+
+        // 2️⃣ Add metadata to Firestore
+        await addDoc(collection(db, "notes"), {
+            title: formData.title,
+            description: formData.description,
+            category: formData.category,
+            uploadedBy: user.uid,
+            uploaderEmail: user.email,
+            fileUrl: result.url,   // Cloudinary URL
+            fileName: file.name,
+            uploadedAt: new Date().toISOString(),
+        });
+
+        setSuccess("Note uploaded successfully!");
+
+        // 3️⃣ Reset form
+        setFormData({
+            title: "",
+            description: "",
+            category: "",
+        });
+        setFile(null);
     };
+
 
     if (success) {
         return (
@@ -233,8 +226,6 @@ const NotesUpload = () => {
                             </button>
                         </div>
                     </div>
-
-                    {/* Diagnostic Tool */}
                     <div style={{ marginTop: '2rem', padding: '1rem', borderTop: '1px solid #eee' }}>
                         <button
                             type="button"

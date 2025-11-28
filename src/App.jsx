@@ -54,8 +54,6 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
-            {/* Student Routes */}
             <Route
               path="/student/dashboard"
               element={

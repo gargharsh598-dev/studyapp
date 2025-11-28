@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { generateRoadmap } from '../services/geminiService';
 import './StudyRoadmap.css';
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 const StudyRoadmap = () => {
     const [topic, setTopic] = useState('Web Development');
@@ -31,16 +32,28 @@ const StudyRoadmap = () => {
         setError('');
         setRoadmap('');
 
-        const result = await generateRoadmap(topic, level);
+        try {
+            const res = await fetch("http://localhost:5000/api/roadmap", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ topic, level })
+            });
 
-        if (result.success) {
-            setRoadmap(result.roadmap);
-        } else {
-            setError(result.error || 'Failed to generate roadmap');
+            const result = await res.json();
+
+            if (result.success) {
+                setRoadmap(result.roadmap);
+            } else {
+                setError(result.error || "Failed to generate roadmap");
+            }
+        } catch (err) {
+            console.error(err);
+            setError("Failed to generate roadmap");
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
     };
+
 
     return (
         <div className="study-roadmap-page">
@@ -68,10 +81,7 @@ const StudyRoadmap = () => {
                         <label className="form-label">Your Level</label>
                         <div className="level-selector">
                             {levels.map((l) => (
-                                <label
-                                    key={l.value}
-                                    className={`level-option ${level === l.value ? 'active' : ''}`}
-                                >
+                                <label key={l.value} className={`level-option ${level === l.value ? 'active' : ''}`}>
                                     <input
                                         type="radio"
                                         name="level"
@@ -111,28 +121,15 @@ const StudyRoadmap = () => {
                     </div>
                 )}
 
-                {roadmap && !loading && (
-                    <div className="roadmap-result card">
-                        <div className="result-header">
-                            <h2>Your {topic} Roadmap</h2>
-                            <span className="badge">{level}</span>
-                        </div>
-                        <div className="roadmap-content">
-                            {roadmap.split('\n').map((line, index) => {
-                                if (line.startsWith('##')) {
-                                    return <h3 key={index}>{line.replace('##', '').trim()}</h3>;
-                                } else if (line.startsWith('#')) {
-                                    return <h2 key={index}>{line.replace('#', '').trim()}</h2>;
-                                } else if (line.startsWith('-') || line.startsWith('*')) {
-                                    return <li key={index}>{line.replace(/^[-*]\s*/, '')}</li>;
-                                } else if (line.trim()) {
-                                    return <p key={index}>{line}</p>;
-                                }
-                                return null;
-                            })}
-                        </div>
-                    </div>
-                )}
+                <div className="roadmap-container">
+
+                    {!loading && roadmap && (
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {roadmap}
+                        </ReactMarkdown>
+                    )}
+                </div>
+
             </div>
         </div>
     );

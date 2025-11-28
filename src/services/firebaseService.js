@@ -19,19 +19,13 @@ export const uploadNote = async (noteData, file) => {
         if (!storage || !db) {
             return { success: false, error: 'Firebase services not initialized. Please check your configuration.' };
         }
-
-        // Create a timeout promise (15 seconds for upload)
         const timeoutPromise = new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Upload timed out. Please check your internet connection.')), 15000)
-        );
-
-        // Upload file to Firebase Storage
+        )
         const uploadTask = async () => {
             const fileRef = ref(storage, `notes/${Date.now()}_${file.name}`);
             const snapshot = await uploadBytes(fileRef, file);
             const fileUrl = await getDownloadURL(snapshot.ref);
-
-            // Save note metadata to Firestore
             const noteDoc = await addDoc(collection(db, 'notes'), {
                 ...noteData,
                 fileUrl,
@@ -42,10 +36,7 @@ export const uploadNote = async (noteData, file) => {
 
             return { success: true, noteId: noteDoc.id, fileUrl };
         };
-
-        // Race between upload and timeout
         return await Promise.race([uploadTask(), timeoutPromise]);
-
     } catch (error) {
         console.error('Error uploading note:', error);
         return { success: false, error: error.message };
@@ -54,42 +45,37 @@ export const uploadNote = async (noteData, file) => {
 
 export const getNotes = async (filters = {}) => {
     try {
-        let q = collection(db, 'notes');
-
-        if (filters.category) {
-            q = query(q, where('category', '==', filters.category));
+        let conditions = [];
+        if (filters.category && filters.category !== "All") {
+            conditions.push(where("category", "==", filters.category));
         }
-
         if (filters.uploadedBy) {
-            q = query(q, where('uploadedBy', '==', filters.uploadedBy));
+            conditions.push(where("uploadedBy", "==", filters.uploadedBy));
         }
-
-        q = query(q, orderBy('uploadedAt', 'desc'));
-
-        const querySnapshot = await getDocs(q);
-        const notes = [];
-        querySnapshot.forEach((doc) => {
-            notes.push({ id: doc.id, ...doc.data() });
-        });
-
+        conditions.push(orderBy("uploadedAt", "desc"));
+        const q = query(collection(db, "notes"), ...conditions);
+        const snapshot = await getDocs(q);
+        const notes = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+        }));
         return { success: true, notes };
     } catch (error) {
-        console.error('Error fetching notes:', error);
+        console.error("Error fetching notes:", error);
         return { success: false, error: error.message, notes: [] };
     }
 };
 
 export const deleteNote = async (noteId, fileUrl) => {
     try {
-        // Delete from Firestore
         await deleteDoc(doc(db, 'notes', noteId));
-
-        // Delete file from Storage
         if (fileUrl) {
-            const fileRef = ref(storage, fileUrl);
+            const decoded = decodeURIComponent(fileUrl);
+            const path = decoded.split("/o/")[1].split("?")[0];
+
+            const fileRef = ref(storage, path);
             await deleteObject(fileRef);
         }
-
         return { success: true };
     } catch (error) {
         console.error('Error deleting note:', error);
@@ -112,7 +98,6 @@ export const saveProgress = async (userId, progressData) => {
                 lastUpdated: new Date().toISOString()
             });
         });
-
         return { success: true };
     } catch (error) {
         console.error('Error saving progress:', error);
