@@ -98,7 +98,7 @@ const TeacherDashboard = () => {
                             📚
                         </div>
                         <div className="stat-content">
-                            <h3>{stats.totalNotes}</h3>
+                            <h3>{notes.length}</h3>
                             <p>Total Notes</p>
                         </div>
                     </div>
@@ -183,7 +183,6 @@ const TeacherDashboard = () => {
                                     <tr>
                                         <th>Title</th>
                                         <th>Category</th>
-                                        <th>Size</th>
                                         <th>Uploaded</th>
                                         <th>Actions</th>
                                     </tr>
@@ -200,7 +199,6 @@ const TeacherDashboard = () => {
                                             <td>
                                                 <span className="badge">{note.category}</span>
                                             </td>
-                                            <td>{(note.fileSize / 1024 / 1024).toFixed(2)} MB</td>
                                             <td>{new Date(note.uploadedAt).toLocaleDateString()}</td>
                                             <td>
                                                 <div className="action-buttons">

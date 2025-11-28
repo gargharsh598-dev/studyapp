@@ -103,7 +103,7 @@ const StudentDashboard = () => {
                             <p>Find study materials quickly with search and filters</p>
                         </div>
 
-                        <div className="action-card card" style={{ opacity: 0.7, cursor: 'not-allowed' }}>
+                        <div className="action-card card" style={{ opacity: 0.7 }}>
                             <div className="action-icon">📊</div>
                             <h3>Progress Report</h3>
                             <p>Coming soon: Track your learning progress</p>

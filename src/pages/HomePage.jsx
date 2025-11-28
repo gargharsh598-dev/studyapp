@@ -112,17 +112,13 @@ const HomePage = () => {
                             <h3>Sign Up</h3>
                             <p>Create your account and choose your role - Teacher or Student</p>
                         </div>
-
                         <div className="step-connector"></div>
-
                         <div className="step">
                             <div className="step-number">2</div>
                             <h3>Set Your Goals</h3>
                             <p>Select your learning topics and let AI generate your personalized roadmap</p>
                         </div>
-
                         <div className="step-connector"></div>
-
                         <div className="step">
                             <div className="step-number">3</div>
                             <h3>Learn & Track</h3>
@@ -131,7 +127,6 @@ const HomePage = () => {
                     </div>
                 </div>
             </section>
-
             {/* CTA Section */}
             <section className="cta">
                 <div className="container">
